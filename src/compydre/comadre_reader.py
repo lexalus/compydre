@@ -32,30 +32,18 @@ class SpeciesMatrix(object):
 
     def return_lc_graph(self):
         pop_types = self.study_info["StudyPopulationGroup"].values
-        G = nx.Graph()
+        G = nx.MultiGraph()
         mat_shape = self.mat_a.shape
         for i in range(0, mat_shape[0]):
             for j in range(0, mat_shape[1]):
                 per_cap_rate = self.mat_a[i][j]
                 if per_cap_rate > 0:
-                    G.add_edge(pop_types[j], pop_types[i], weight=per_cap_rate)
+                    G.add_edge(pop_types[j], pop_types[i], weight=per_cap_rate, labels=True)
         return G
 
     def show_lc_graph(self):
-        pos = nx.spring_layout(self.lc_graph)  # positions for all nodes
-
-        # nodes
-        nx.draw_networkx_nodes(self.lc_graph, pos, node_size=700)
-
-        # edges
-        edge_list = [(u, v) for (u, v, d) in self.lc_graph.edges(data=True)]
-        nx.draw_networkx_edges(self.lc_graph, pos, edgelist=edge_list, width=6)
-
-        # labels
-        nx.draw_networkx_labels(
-            self.lc_graph, pos, font_size=10, font_family="sans-serif"
-        )
-
+        plt.figure(figsize=(15, 10))
+        nx.draw_networkx(self.lc_graph, node_size=1000, font_weight="bold")
         plt.axis("off")
         plt.show()
 
@@ -131,7 +119,6 @@ class ComadreReader(object):
         self._metadata = self.return_metadata()
 
         for i in species_list:
-            print("Gathering species data")
             if i not in species_dict:
 
                 species_dict[i] = []

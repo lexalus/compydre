@@ -7,21 +7,39 @@ from scipy import stats
 
 class NetworkAnalysis(object):
     def __init__(
-        self, species, species_class, common_name, comadre_reader=None, asnr_reader=None
+        self, species, species_class, common_name, comadre_reader, asnr_reader
     ):
         self.species = species
         self.species_class = species_class
         self.common_name = common_name
-        self.comadre_reader = comadre_reader
+        self.comadre_reader = comadre_reader.species_data
         self.asnr_reader = asnr_reader.species_data
         self._comadre_report = None
         self._asnr_report = None
         self._dual_report = None
 
+    def create_population_forecast(self, mpm):
+        growth = mpm.project_species_growth(10)
+        pops = mpm.study_info.StudyPopulationGroup.values
+        plt.figure(figsize=(10,5))
+        for i in range(len(pops)):
+            population = list(map(lambda x: x[i], growth.values()))
+            years = range(len(growth))
+            plt.title("Matrix Population Model Forecast for {}".format(self.species), fontsize=12)
+            plt.ylabel("Projected Population", fontsize=12)
+            plt.xlabel("Projected Years", fontsize=12)
+            plt.plot(years, population, label=pops[i])
+        plt.legend()
+        plt.show()
+        print()
+
     def create_comadre_report(self):
-        print("Gathering three random matrix population models...")
         print("Projected population growth for {}".format(self.species))
-        print("Lifecycle graphs for {}".format(self.species))
+        species_mpm = self.comadre_reader[self.species][0]
+        self.create_population_forecast(species_mpm)
+        print("Lifecycle graph for {}".format(self.species))
+        species_mpm.show_lc_graph()
+        print()
         return
 
     @staticmethod
@@ -51,7 +69,7 @@ class NetworkAnalysis(object):
         pos = nx.spring_layout(g)
         plt.figure(figsize=(15, 10))
         ec = nx.draw_networkx_edges(
-            g, pos, edge_color=weights, alpha=0.2, edge_cmap=plt.cm.Reds, width=5
+            g, pos, edge_color=abs(stats.zscore(weights) * 1000), alpha=0.6, edge_cmap=plt.cm.Reds, width=5
         )
         nc = nx.draw_networkx_nodes(
             g,
@@ -85,8 +103,9 @@ class NetworkAnalysis(object):
         )
         meta_dict = data["metadata"]
         self.print_asnr_metadata(meta_dict)
+        print()
         print("Showing graph for the social contact graph")
-        self.create_asnr_graph(data["graphs"][0])
+        self.create_asnr_graph(data["graphs"][0].graph)
         return
 
     def show_reports(self):

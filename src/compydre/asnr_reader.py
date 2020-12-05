@@ -108,13 +108,12 @@ class ASNRReader(object):
 
     def create_species_data(self):
         species_data = {}
+        print("Gathering data from the ASNR Repository")
         for species_class in ACCEPTED_CLASSES:
-            print("Gathering urls for {}".format(species_class))
             class_urls = self.find_class_urls(species_class)
-            print("Gathering graphs for {}".format(species_class))
             graph_dict = self.create_species_graph_dict(class_urls, species_class)
             species_data[species_class] = graph_dict
-            print("Graphs are set for {}".format(species_class))
+        print("Data is now available")
         self._species_data = species_data
         return
 
