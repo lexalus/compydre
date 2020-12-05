@@ -49,7 +49,8 @@ setup(
     ],
     python_requires='>=3.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     install_requires=[
-       'numpy', 'pandas', 'rpy2', 'scipy', 'matplotlib', 'networkx'
+       'numpy', 'pandas', 'rpy2', 'scipy', 'matplotlib', 'networkx',
+        'beautifulsoup4', 'requests'
     ],
     setup_requires=[
         'pytest-runner',
